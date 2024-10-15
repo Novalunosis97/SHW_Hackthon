@@ -1,0 +1,76 @@
+body {
+    color: #333;
+    background-color: #f0f2f6;
+}
+
+.fancy-title {
+    color: #2c3e50;
+    font-size: 3em;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.subtitle {
+    color: #34495e;
+    font-size: 1.2em;
+    font-style: italic;
+}
+
+.form-header {
+    color: #2980b9;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.stButton > button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+.results-container {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.results-header {
+    color: #e74c3c;
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+/* Custom styling for form inputs */
+.stTextInput > div > div > input {
+    border-radius: 20px;
+}
+
+.stTextArea > div > div > textarea {
+    border-radius: 15px;
+}
+
+.stSelectbox > div > div > select {
+    border-radius: 20px;
+}
+
+/* Animate the Lottie animations */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}
+
+.element-container:has(> iframe[title="lottie-animation"]) {
+    animation: float 6s ease-in-out infinite;
+}
