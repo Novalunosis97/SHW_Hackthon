@@ -1,11 +1,77 @@
 import streamlit as st
 import random
 import time
-import pandas as pd
-import plotly.express as px
 from datetime import datetime
 
-# Custom problem generators for different topics
+def get_solution_steps(problem, answer, topic, user_answer):
+    if topic == "Arithmetic":
+        a, operation, b = problem.split()
+        a, b = int(a), int(b)
+        steps = []
+        
+        if operation == '+':
+            steps = [
+                f"1. Line up the numbers: {a} + {b}",
+                f"2. Add from right to left: {a} + {b} = {answer}"
+            ]
+        elif operation == '-':
+            steps = [
+                f"1. Line up the numbers: {a} - {b}",
+                f"2. Subtract: {a} - {b} = {answer}"
+            ]
+        elif operation == '×':
+            steps = [
+                f"1. Multiply the numbers: {a} × {b}",
+                f"2. {a} × {b} = {answer}"
+            ]
+        elif operation == '÷':
+            steps = [
+                f"1. Set up division: {a} ÷ {b}",
+                f"2. {a} ÷ {b} = {answer}"
+            ]
+    
+    elif topic == "Algebra":
+        if "+" in problem:
+            parts = problem.split("=")
+            steps = [
+                "1. Start with the equation: " + problem,
+                f"2. Isolate the variable: x = {answer}",
+                f"3. Check: Plug {answer} back into the original equation"
+            ]
+        else:
+            steps = [
+                "1. Start with the equation: " + problem,
+                f"2. Solve for x: x = {answer}",
+                f"3. Verify your solution by substituting x = {answer}"
+            ]
+    
+    elif topic == "Geometry":
+        if "rectangle" in problem:
+            width = int(problem.split("width")[1].split("and")[0])
+            height = int(problem.split("height")[1])
+            steps = [
+                "1. Use the formula: Area = width × height",
+                f"2. Plug in the values: Area = {width} × {height}",
+                f"3. Calculate: Area = {answer} square units"
+            ]
+        elif "triangle" in problem:
+            base = int(problem.split("base")[1].split("and")[0])
+            height = int(problem.split("height")[1])
+            steps = [
+                "1. Use the formula: Area = ½ × base × height",
+                f"2. Plug in the values: Area = ½ × {base} × {height}",
+                f"3. Calculate: Area = {answer} square units"
+            ]
+        elif "circle" in problem:
+            radius = int(problem.split("radius")[1].split("(")[0])
+            steps = [
+                "1. Use the formula: Area = πr²",
+                f"2. Plug in radius = {radius}: Area = 3.14159 × {radius}²",
+                f"3. Calculate: Area = {answer} square units"
+            ]
+    
+    return steps
+
 def generate_arithmetic_problem(difficulty):
     if difficulty == "Easy":
         a = random.randint(1, 10)
@@ -17,23 +83,20 @@ def generate_arithmetic_problem(difficulty):
         a = random.randint(50, 100)
         b = random.randint(50, 100)
     
-    operation = random.choice(['+', '-', '*', '/'])
+    operation = random.choice(['+', '-', '×', '÷'])
     if operation == '+':
         answer = a + b
-        problem = f"{a} + {b}"
     elif operation == '-':
         answer = a - b
-        problem = f"{a} - {b}"
-    elif operation == '*':
+    elif operation == '×':
         answer = a * b
-        problem = f"{a} × {b}"
     else:
         # Ensure clean division
         answer = a
         b = random.randint(1, 10)
         a = answer * b
-        problem = f"{a} ÷ {b}"
     
+    problem = f"{a} {operation} {b}"
     return problem, answer
 
 def generate_algebra_problem(difficulty):
@@ -61,38 +124,30 @@ def generate_algebra_problem(difficulty):
 
 def generate_geometry_problem(difficulty):
     if difficulty == "Easy":
-        # Area of rectangle
         width = random.randint(2, 10)
         height = random.randint(2, 10)
         answer = width * height
         problem = f"Find the area of a rectangle with width {width} and height {height}"
     elif difficulty == "Medium":
-        # Area of triangle
         base = random.randint(2, 10)
         height = random.randint(2, 10)
         answer = (base * height) / 2
         problem = f"Find the area of a triangle with base {base} and height {height}"
     else:
-        # Area of circle
         radius = random.randint(2, 10)
         answer = round(3.14159 * radius * radius, 2)
         problem = f"Find the area of a circle with radius {radius} (use π = 3.14159)"
     
     return problem, answer
 
-def save_progress():
-    if 'history' in st.session_state:
-        df = pd.DataFrame(st.session_state.history)
-        df.to_csv('math_progress.csv', index=False)
-
-def load_progress():
-    try:
-        return pd.read_csv('math_progress.csv')
-    except:
-        return pd.DataFrame(columns=['timestamp', 'topic', 'difficulty', 'correct', 'time_taken'])
-
 def main():
-    st.set_page_config(page_title="Advanced Math Practice", page_icon="🔢", layout="wide")
+    st.set_page_config(page_title="Math Practice", page_icon="🔢")
+    
+    st.title("🎓 Math Practice")
+    st.markdown("""
+    Practice your math skills with different topics and difficulty levels.
+    Get immediate feedback and learn from detailed explanations!
+    """)
     
     # Initialize session state
     if 'score' not in st.session_state:
@@ -101,13 +156,6 @@ def main():
         st.session_state.total_questions = 0
     if 'streak' not in st.session_state:
         st.session_state.streak = 0
-    if 'history' not in st.session_state:
-        st.session_state.history = []
-    if 'start_time' not in st.session_state:
-        st.session_state.start_time = time.time()
-    
-    # Header
-    st.title("🎓 Advanced Math Practice")
     
     # Sidebar settings
     with st.sidebar:
@@ -124,14 +172,13 @@ def main():
             st.session_state.score = 0
             st.session_state.total_questions = 0
             st.session_state.streak = 0
-            st.session_state.history = []
             st.rerun()
     
-    # Main content
+    # Main content area
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        # Generate problem based on topic
+        # Generate problem
         if 'current_problem' not in st.session_state:
             if topic == "Arithmetic":
                 st.session_state.current_problem = generate_arithmetic_problem(difficulty)
@@ -142,37 +189,28 @@ def main():
         
         problem, answer = st.session_state.current_problem
         
-        # Display problem
         st.markdown(f"### Problem:")
         st.markdown(f"#### {problem}")
         
-        # Answer input
         user_answer = st.number_input("Your answer:", step=0.01, format="%.2f")
         
-        # Submit button
         if st.button("Submit Answer"):
-            time_taken = time.time() - st.session_state.start_time
             st.session_state.total_questions += 1
             
-            # Record attempt in history
-            st.session_state.history.append({
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                'topic': topic,
-                'difficulty': difficulty,
-                'correct': abs(user_answer - answer) < 0.01,
-                'time_taken': round(time_taken, 2)
-            })
-            
-            if abs(user_answer - answer) < 0.01:  # Allow for small floating-point differences
+            if abs(user_answer - answer) < 0.01:
                 st.success("🎉 Correct! Well done!")
                 st.session_state.score += 1
                 st.session_state.streak += 1
             else:
-                st.error(f"❌ Not quite. The correct answer was {answer}")
+                st.error("❌ Not quite correct.")
                 st.session_state.streak = 0
-            
-            # Save progress
-            save_progress()
+                
+                # Show solution steps
+                st.markdown("### Let's solve this step by step:")
+                steps = get_solution_steps(problem, answer, topic, user_answer)
+                for step in steps:
+                    st.markdown(f"- {step}")
+                st.markdown(f"**The correct answer is: {answer}**")
             
             # Generate new problem
             if topic == "Arithmetic":
@@ -182,34 +220,18 @@ def main():
             else:
                 st.session_state.current_problem = generate_geometry_problem(difficulty)
             
-            st.session_state.start_time = time.time()
             st.rerun()
     
     with col2:
-        # Analytics section
+        # Simple progress bar
         st.markdown("### Your Progress")
-        
-        if st.session_state.history:
-            df = pd.DataFrame(st.session_state.history)
-            
-            # Success rate chart
-            success_rate = df['correct'].rolling(window=5).mean()
-            fig1 = px.line(success_rate, title='Success Rate (Last 5 Questions)')
-            fig1.update_layout(yaxis_range=[0, 1])
-            st.plotly_chart(fig1, use_container_width=True)
-            
-            # Topic performance
-            st.markdown("#### Topic Performance")
-            topic_stats = df.groupby('topic')['correct'].agg(['count', 'mean']).round(2)
-            st.dataframe(topic_stats)
-            
-            # Average time per difficulty
-            st.markdown("#### Average Time by Difficulty")
-            time_stats = df.groupby('difficulty')['time_taken'].mean().round(2)
-            st.dataframe(time_stats)
+        if st.session_state.total_questions > 0:
+            progress = st.session_state.score / st.session_state.total_questions
+            st.progress(progress)
+            st.markdown(f"Accuracy: {(progress * 100):.1f}%")
     
-    # Tips and hints
-    with st.expander("Tips & Formulas"):
+    # Tips section
+    with st.expander("Need help? Check these tips!"):
         if topic == "Arithmetic":
             st.markdown("""
             - Remember order of operations (PEMDAS)
@@ -229,6 +251,3 @@ def main():
             - Area of circle = πr²
             - π ≈ 3.14159
             """)
-
-if __name__ == "__main__":
-    main()
