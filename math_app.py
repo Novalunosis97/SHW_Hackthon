@@ -36,8 +36,8 @@ def analyze_mistake(problem, correct_answer, user_answer, topic):
                 return f"You're close! Did you round your answer correctly?"
             else:
                 return f"Check your division steps. Remember, {a} ÷ {b} means 'how many {b}s go into {a}?'"
-    
-    elif topic == "Algebra":
+            
+        elif topic == "Algebra":
         if abs(user_answer) == abs(correct_answer) and user_answer != correct_answer:
             return "Check the sign of your answer. Did you move terms correctly between sides?"
         elif "+" in problem:
@@ -48,21 +48,21 @@ def analyze_mistake(problem, correct_answer, user_answer, topic):
                 return f"Check how you isolated the variable. What steps did you take to solve for x?"
         else:
             return f"Your answer {user_answer} doesn't satisfy the equation. Try plugging it back in to check."
-    
-    elif topic == "Geometry":
+            
+        elif topic == "Geometry":
         if "rectangle" in problem:
             if abs(user_answer - correct_answer) < correct_answer * 0.1:
                 return "You're close! Double-check your multiplication."
             else:
                 return "Remember: Area of a rectangle = width × height. Did you multiply both dimensions?"
-        
-        elif "triangle" in problem:
+                
+            elif "triangle" in problem:
             if user_answer == correct_answer * 2:
                 return "Did you forget to divide by 2? Remember: Area of triangle = (base × height) ÷ 2"
             else:
                 return "Remember: Area of triangle = (base × height) ÷ 2. Check your calculations."
-        
-        elif "circle" in problem:
+                
+            elif "circle" in problem:
             if abs(user_answer - correct_answer) < 1:
                 return "Almost there! Did you use 3.14159 for π?"
             elif user_answer == correct_answer / 2:
