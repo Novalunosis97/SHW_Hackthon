@@ -4,73 +4,144 @@ import time
 from datetime import datetime
 
 def analyze_mistake(problem, correct_answer, user_answer, topic):
-    """Analyze what went wrong with the user's answer"""
-    if topic == "Arithmetic":
-        a, operation, b = problem.split()
-        a, b = int(a), int(b)
-        
-        if operation == '+':
-            if user_answer < correct_answer:
-                return f"Your answer {user_answer} is too small. Did you carry all digits correctly?"
-            else:
-                return f"Your answer {user_answer} is too large. Check if you added all digits correctly."
-        
-        elif operation == '-':
-            if user_answer > correct_answer:
-                return f"Your answer {user_answer} is too large. Did you borrow correctly?"
-            else:
-                return f"Your answer {user_answer} is too small. Check your subtraction steps."
-        
-        elif operation == '×':
-            if user_answer == a + b:
-                return f"It looks like you added {a} + {b} instead of multiplying them."
-            elif user_answer < correct_answer:
-                return f"Your answer {user_answer} is too small. Check if you multiplied all digits correctly."
-            else:
-                return f"Your answer {user_answer} is too large. Check your multiplication steps."
-        
-        elif operation == '÷':
-            if user_answer == a * b:
-                return f"It looks like you multiplied {a} × {b} instead of dividing them."
-            elif abs(user_answer - correct_answer) < 1:
-                return f"You're close! Did you round your answer correctly?"
-            else:
-                return f"Check your division steps. Remember, {a} ÷ {b} means 'how many {b}s go into {a}?'"
-            
-        elif topic == "Algebra":
-        if abs(user_answer) == abs(correct_answer) and user_answer != correct_answer:
-            return "Check the sign of your answer. Did you move terms correctly between sides?"
-        elif "+" in problem:
-            equation = problem.split("=")[0].strip()
-            if user_answer * 2 == correct_answer:
-                return f"Did you forget to consider both sides of the equation? Remember to isolate the variable."
-            else:
-                return f"Check how you isolated the variable. What steps did you take to solve for x?"
-        else:
-            return f"Your answer {user_answer} doesn't satisfy the equation. Try plugging it back in to check."
-            
-        elif topic == "Geometry":
-        if "rectangle" in problem:
-            if abs(user_answer - correct_answer) < correct_answer * 0.1:
-                return "You're close! Double-check your multiplication."
-            else:
-                return "Remember: Area of a rectangle = width × height. Did you multiply both dimensions?"
-                
-            elif "triangle" in problem:
-            if user_answer == correct_answer * 2:
-                return "Did you forget to divide by 2? Remember: Area of triangle = (base × height) ÷ 2"
-            else:
-                return "Remember: Area of triangle = (base × height) ÷ 2. Check your calculations."
-                
-            elif "circle" in problem:
-            if abs(user_answer - correct_answer) < 1:
-                return "Almost there! Did you use 3.14159 for π?"
-            elif user_answer == correct_answer / 2:
-                return "Did you forget to square the radius? Area = πr²"
-            else:
-                return "Remember: Area of circle = πr². Check your calculations."
+    """
+    Analyze what went wrong with the user's answer and provide specific feedback.
+    Returns detailed explanation of the likely mistake and suggestions for improvement.
     
-    return "Let's look at how to solve this step by step."
+    Args:
+        problem (str): The problem text or equation
+        correct_answer (float): The correct numerical answer
+        user_answer (float): The user's submitted answer
+        topic (str): The topic area ("Arithmetic", "Algebra", or "Geometry")
+    
+    Returns:
+        str: Detailed analysis of the mistake with suggestions
+    """
+    # Handle arithmetic problems
+    if topic == "Arithmetic":
+        try:
+            a, operation, b = problem.split()
+            a, b = int(a), int(b)
+            
+            if operation == '+':
+                if user_answer < correct_answer:
+                    if abs(user_answer - (a + b % 10)) < 0.01:
+                        return f"Your answer {user_answer} is too small. Did you forget to carry the tens digit? Remember to add any carried numbers."
+                    return f"Your answer {user_answer} is too small. Check if you carried all digits correctly when adding {a} and {b}."
+                else:
+                    if abs(user_answer - (a + b + 10)) < 0.01:
+                        return f"Your answer {user_answer} is too large. Did you carry a digit when you didn't need to?"
+                    return f"Your answer {user_answer} is too large. Double-check your addition steps and make sure you didn't count any digits twice."
+            
+            elif operation == '-':
+                if user_answer > correct_answer:
+                    if abs(user_answer - (a - b + 10)) < 0.01:
+                        return f"Your answer {user_answer} is too large. Did you forget to complete the borrowing process?"
+                    return f"Your answer {user_answer} is too large. When borrowing, remember to subtract 1 from the next digit to the left."
+                else:
+                    if abs(user_answer - (a - b - 10)) < 0.01:
+                        return f"Your answer {user_answer} is too small. Did you borrow when you didn't need to?"
+                    return f"Your answer {user_answer} is too small. Check your subtraction steps and make sure you borrowed correctly when needed."
+            
+            elif operation == '×':
+                if abs(user_answer - (a + b)) < 0.01:
+                    return f"It looks like you added {a} + {b} instead of multiplying them. Remember, {a} × {b} means adding {a} to itself {b} times."
+                elif user_answer < correct_answer:
+                    if abs(user_answer - (a * (b-1))) < 0.01:
+                        return f"Your answer {user_answer} is too small. Did you multiply by {b-1} instead of {b}?"
+                    return f"Your answer {user_answer} is too small. Check if you multiplied all digits correctly and included all partial products."
+                else:
+                    if abs(user_answer - (a * (b+1))) < 0.01:
+                        return f"Your answer {user_answer} is too large. Did you multiply by {b+1} instead of {b}?"
+                    return f"Your answer {user_answer} is too large. Check your multiplication steps and make sure you aligned the partial products correctly."
+            
+            elif operation == '÷':
+                if abs(user_answer - (a * b)) < 0.01:
+                    return f"It looks like you multiplied {a} × {b} instead of dividing them. Remember, {a} ÷ {b} means 'how many {b}s go into {a}?'"
+                elif abs(user_answer - (b / a)) < 0.01:
+                    return f"It looks like you divided {b} by {a} instead of {a} by {b}. Remember to keep the order straight: {a} ÷ {b}."
+                elif abs(user_answer - correct_answer) < 1:
+                    return f"You're close! Did you round your answer correctly? When dividing {a} by {b}, we get {correct_answer}."
+                else:
+                    return f"Check your division steps. Remember to multiply your answer ({user_answer}) by {b} - it should equal {a}."
+        except:
+            return "There seems to be an error in processing the arithmetic problem. Let's solve it step by step."
+    
+    # Handle algebra problems
+    elif topic == "Algebra":
+        if "=" not in problem:
+            return "Let's solve this step by step to find the correct answer."
+        
+        if abs(abs(user_answer) - abs(correct_answer)) < 0.01 and user_answer != correct_answer:
+            return "Check the sign of your answer. Did you keep track of negative signs when moving terms between sides?"
+        
+        if "+" in problem:
+            try:
+                equation = problem.split("=")[0].strip()
+                if user_answer * 2 == correct_answer:
+                    return f"Did you forget to consider both sides of the equation? When solving {equation}, make sure to isolate the variable completely."
+                elif user_answer == correct_answer / 2:
+                    return f"Did you divide by 2 when you didn't need to? Check your steps when isolating the variable."
+                else:
+                    return f"Check how you isolated the variable. Try plugging your answer ({user_answer}) back into the original equation to verify."
+            except:
+                return "Let's solve this equation step by step to find where the mistake might be."
+        
+        if "²" in problem or "^2" in problem:
+            try:
+                if user_answer == -correct_answer:
+                    return "Remember that quadratic equations can have two solutions. Did you consider both the positive and negative square root?"
+                return "When solving quadratic equations, remember to check both possible solutions."
+            except:
+                return "Let's solve this quadratic equation step by step."
+        
+        return f"Try plugging your answer ({user_answer}) back into the original equation to see if it works."
+    
+    # Handle geometry problems
+    elif topic == "Geometry":
+        if "rectangle" in problem.lower():
+            try:
+                dimensions = problem.split("width")[1].split("and")
+                width = int(dimensions[0])
+                height = int(dimensions[1].split()[1])
+                if abs(user_answer - (width + height)) < 0.01:
+                    return f"It looks like you added the width ({width}) and height ({height}) instead of multiplying them. Remember: Area = width × height"
+                elif abs(user_answer - correct_answer) < correct_answer * 0.1:
+                    return "You're close! Double-check your multiplication. Remember to multiply width × height carefully."
+                else:
+                    return f"Remember: Area of a rectangle = width × height = {width} × {height}. Try redoing the multiplication."
+            except:
+                return "Let's solve this step by step using the rectangle area formula: Area = width × height"
+        
+        elif "triangle" in problem.lower():
+            try:
+                if user_answer == correct_answer * 2:
+                    return "Did you forget to divide by 2? Remember: Area of triangle = (base × height) ÷ 2"
+                elif user_answer == correct_answer / 2:
+                    return "Did you divide by 4 instead of 2? The formula is: Area = (base × height) ÷ 2"
+                else:
+                    return "Remember: Area of triangle = (base × height) ÷ 2. Try the calculation again with this formula."
+            except:
+                return "Let's solve this step by step using the triangle area formula: Area = (base × height) ÷ 2"
+        
+        elif "circle" in problem.lower():
+            try:
+                radius = float(problem.split("radius")[1].split("(")[0])
+                if abs(user_answer - (2 * 3.14159 * radius)) < 0.01:
+                    return f"It looks like you calculated the circumference (2πr) instead of the area (πr²). Remember to square the radius."
+                elif abs(user_answer - (3.14159 * radius)) < 0.01:
+                    return f"Did you forget to square the radius? Remember: Area = πr² = π × {radius} × {radius}"
+                elif abs(user_answer - correct_answer) < 1:
+                    return "Almost there! Did you use 3.14159 for π? Check your multiplication steps."
+                else:
+                    return f"Remember: Area of circle = πr² = 3.14159 × {radius}². Try the calculation again."
+            except:
+                return "Let's solve this step by step using the circle area formula: Area = πr²"
+    
+    # Default response if no specific analysis can be made
+    return "Let's break this down and solve it step by step to understand where the mistake occurred."
+
+       
 
 def get_solution_steps(problem, answer, topic, user_answer):
     """Generate step-by-step solution explanation"""
