@@ -251,3 +251,6 @@ def main():
             - Area of circle = πr²
             - π ≈ 3.14159
             """)
+    
+if __name__ == "__main__":
+    main()
