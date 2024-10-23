@@ -17,7 +17,6 @@ def analyze_mistake(problem, correct_answer, user_answer, topic):
     Returns:
         str: Detailed analysis of the mistake with suggestions
     """
-    # Handle arithmetic problems
     if topic == "Arithmetic":
         try:
             a, operation, b = problem.split()
@@ -67,7 +66,6 @@ def analyze_mistake(problem, correct_answer, user_answer, topic):
         except:
             return "There seems to be an error in processing the arithmetic problem. Let's solve it step by step."
     
-    # Handle algebra problems
     elif topic == "Algebra":
         if "=" not in problem:
             return "Let's solve this step by step to find the correct answer."
@@ -97,7 +95,6 @@ def analyze_mistake(problem, correct_answer, user_answer, topic):
         
         return f"Try plugging your answer ({user_answer}) back into the original equation to see if it works."
     
-    # Handle geometry problems
     elif topic == "Geometry":
         if "rectangle" in problem.lower():
             try:
@@ -138,7 +135,6 @@ def analyze_mistake(problem, correct_answer, user_answer, topic):
             except:
                 return "Let's solve this step by step using the circle area formula: Area = πr²"
     
-    # Default response if no specific analysis can be made
     return "Let's break this down and solve it step by step to understand where the mistake occurred."
 
 def get_solution_steps(problem, answer, topic, user_answer):
@@ -190,9 +186,8 @@ def get_solution_steps(problem, answer, topic, user_answer):
             ]
     
     elif topic == "Algebra":
-        # Enhanced algebra solution steps
         if "=" in problem:
-            equation = problem.split(": ")[1]  # Remove "Solve for x: " part
+            equation = problem.split(": ")[1]  
             left_side = equation.split("=")[0].strip()
             right_side = equation.split("=")[1].strip()
             steps = [
@@ -234,11 +229,10 @@ def get_solution_steps(problem, answer, topic, user_answer):
                 f"The area is {answer} square units"
             ]
     
-    # Make sure each step is clearly visible
     formatted_steps = []
     for i, step in enumerate(steps, 1):
         formatted_steps.append(f"{step}")
-        formatted_steps.append("---")  # Add separator between steps
+        formatted_steps.append("---")  
     
     return formatted_steps
 
@@ -261,7 +255,6 @@ def generate_arithmetic_problem(difficulty):
     elif operation == '×':
         answer = a * b
     else:
-        # Ensure clean division
         answer = a
         b = random.randint(1, 10)
         a = answer * b
@@ -319,7 +312,6 @@ def main():
     Get immediate feedback and learn from detailed explanations!
     """)
     
-    # Initialize session state
     if 'score' not in st.session_state:
         st.session_state.score = 0
     if 'total_questions' not in st.session_state:
@@ -329,7 +321,6 @@ def main():
     if 'current_problem' not in st.session_state:
         st.session_state.current_problem = None
     
-    # Sidebar settings
     with st.sidebar:
         st.header("Settings")
         topic = st.selectbox("Choose topic:", ["Arithmetic", "Algebra", "Geometry"])
@@ -347,11 +338,9 @@ def main():
             st.session_state.current_problem = None
             st.rerun()
     
-    # Main content area
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        # Generate problem
         if st.session_state.current_problem is None:
             if topic == "Arithmetic":
                 st.session_state.current_problem = generate_arithmetic_problem(difficulty)
@@ -371,14 +360,13 @@ def main():
             st.session_state.total_questions += 1
             
             if abs(user_answer - answer) < 0.01:
-                st.success("🎉 Correct! Well done!")
+                st.markdown("🎉 Correct! Well done!")
                 st.session_state.score += 1
                 st.session_state.streak += 1
             else:
                 st.error("❌ Not quite correct.")
                 st.session_state.streak = 0
                 
-                # Show solution steps immediately
                 st.markdown("### How to Solve This Problem:")
                 steps = get_solution_steps(problem, answer, topic, user_answer)
                 for step in steps:
@@ -390,7 +378,6 @@ def main():
                 mistake_analysis = analyze_mistake(problem, answer, user_answer, topic)
                 st.markdown(f"**Explanation:** {mistake_analysis}")
                 
-                # For arithmetic problems, show the comparison
                 if topic == "Arithmetic":
                     st.markdown("### Side by Side Comparison:")
                     col1, col2 = st.columns(2)
@@ -401,7 +388,6 @@ def main():
                         st.markdown("**Correct approach:**")
                         st.markdown(f"{problem} = {answer}")
             
-            # Generate new problem for next attempt
             if topic == "Arithmetic":
                 st.session_state.current_problem = generate_arithmetic_problem(difficulty)
             elif topic == "Algebra":
@@ -409,18 +395,15 @@ def main():
             else:
                 st.session_state.current_problem = generate_geometry_problem(difficulty)
             
-            # Force a rerun to show the new problem
             st.rerun()
     
     with col2:
-        # Progress bar and accuracy
         st.markdown("### Your Progress")
         if st.session_state.total_questions > 0:
             progress = st.session_state.score / st.session_state.total_questions
             st.progress(progress)
             st.markdown(f"Accuracy: {(progress * 100):.1f}%")
     
-    # Tips section at the bottom
     with st.expander("Need help? Check these tips!"):
         if topic == "Arithmetic":
             st.markdown("""
