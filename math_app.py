@@ -181,7 +181,7 @@ def get_solution_steps(problem, answer, topic, user_answer):
                     f"The correct answer is {answer}"
                 ]
     
-    elif topic == "Algebra":
+     elif topic == "Algebra":
         if "+" in problem:
             left_side = problem.split("=")[0].strip()
             right_side = problem.split("=")[1].strip()
@@ -201,7 +201,7 @@ def get_solution_steps(problem, answer, topic, user_answer):
                 f"5. Check: Plug {answer} back into the original equation"
             ]
     
-    elif topic == "Geometry":
+     elif topic == "Geometry":
         if "rectangle" in problem:
             dimensions = problem.split("with")[1].strip()
             steps = [
