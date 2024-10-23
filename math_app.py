@@ -72,44 +72,8 @@ def analyze_mistake(problem, correct_answer, user_answer, topic):
     
     return "Let's look at how to solve this step by step."
 
-[... Rest of the previous code remains the same until the submit answer button handling ...]
-
-        if st.button("Submit Answer"):
-            st.session_state.total_questions += 1
-            
-            if abs(user_answer - answer) < 0.01:
-                st.success("🎉 Correct! Well done!")
-                st.session_state.score += 1
-                st.session_state.streak += 1
-            else:
-                st.error("❌ Not quite correct.")
-                st.session_state.streak = 0
-                
-                # Show error analysis
-                mistake_analysis = analyze_mistake(problem, answer, user_answer, topic)
-                st.markdown("### Understanding Your Answer:")
-                st.markdown(f"**Your answer:** {user_answer}")
-                st.markdown(f"**Correct answer:** {answer}")
-                st.markdown(f"**What went wrong:** {mistake_analysis}")
-                
-                # Show solution steps
-                st.markdown("### Let's solve this step by step:")
-                steps = get_solution_steps(problem, answer, topic, user_answer)
-                for step in steps:
-                    st.markdown(f"- {step}")
-                
-                # Show comparison if relevant
-                if topic == "Arithmetic":
-                    st.markdown("### Compare the solutions:")
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.markdown("**Your approach:**")
-                        st.markdown(f"{problem} = {user_answer}")
-                    with col2:
-                        st.markdown("**Correct approach:**")
-                        st.markdown(f"{problem} = {answer}")
-
 def get_solution_steps(problem, answer, topic, user_answer):
+    """Generate step-by-step solution explanation"""
     if topic == "Arithmetic":
         a, operation, b = problem.split()
         a, b = int(a), int(b)
@@ -118,22 +82,26 @@ def get_solution_steps(problem, answer, topic, user_answer):
         if operation == '+':
             steps = [
                 f"1. Line up the numbers: {a} + {b}",
-                f"2. Add from right to left: {a} + {b} = {answer}"
+                f"2. Add from right to left: {a} + {b} = {answer}",
+                f"3. Your answer was {user_answer}, but {a} + {b} = {answer}"
             ]
         elif operation == '-':
             steps = [
                 f"1. Line up the numbers: {a} - {b}",
-                f"2. Subtract: {a} - {b} = {answer}"
+                f"2. Subtract: {a} - {b} = {answer}",
+                f"3. Your answer was {user_answer}, but {a} - {b} = {answer}"
             ]
         elif operation == '×':
             steps = [
-                f"1. Multiply the numbers: {a} × {b}",
-                f"2. {a} × {b} = {answer}"
+                f"1. Set up multiplication: {a} × {b}",
+                f"2. Multiply: {a} × {b} = {answer}",
+                f"3. Your answer was {user_answer}, but {a} × {b} = {answer}"
             ]
         elif operation == '÷':
             steps = [
                 f"1. Set up division: {a} ÷ {b}",
-                f"2. {a} ÷ {b} = {answer}"
+                f"2. Divide: {a} ÷ {b} = {answer}",
+                f"3. Your answer was {user_answer}, but {a} ÷ {b} = {answer}"
             ]
     
     elif topic == "Algebra":
@@ -142,13 +110,15 @@ def get_solution_steps(problem, answer, topic, user_answer):
             steps = [
                 "1. Start with the equation: " + problem,
                 f"2. Isolate the variable: x = {answer}",
-                f"3. Check: Plug {answer} back into the original equation"
+                f"3. Check: Plug {answer} back into the original equation",
+                f"4. Your answer was {user_answer}, but x = {answer} satisfies the equation"
             ]
         else:
             steps = [
                 "1. Start with the equation: " + problem,
                 f"2. Solve for x: x = {answer}",
-                f"3. Verify your solution by substituting x = {answer}"
+                f"3. Verify the solution by substituting x = {answer}",
+                f"4. Your answer was {user_answer}, but x = {answer} is correct"
             ]
     
     elif topic == "Geometry":
@@ -158,7 +128,8 @@ def get_solution_steps(problem, answer, topic, user_answer):
             steps = [
                 "1. Use the formula: Area = width × height",
                 f"2. Plug in the values: Area = {width} × {height}",
-                f"3. Calculate: Area = {answer} square units"
+                f"3. Calculate: Area = {answer} square units",
+                f"4. Your answer was {user_answer}, but {width} × {height} = {answer}"
             ]
         elif "triangle" in problem:
             base = int(problem.split("base")[1].split("and")[0])
@@ -166,14 +137,16 @@ def get_solution_steps(problem, answer, topic, user_answer):
             steps = [
                 "1. Use the formula: Area = ½ × base × height",
                 f"2. Plug in the values: Area = ½ × {base} × {height}",
-                f"3. Calculate: Area = {answer} square units"
+                f"3. Calculate: Area = {answer} square units",
+                f"4. Your answer was {user_answer}, but ½ × {base} × {height} = {answer}"
             ]
         elif "circle" in problem:
             radius = int(problem.split("radius")[1].split("(")[0])
             steps = [
                 "1. Use the formula: Area = πr²",
                 f"2. Plug in radius = {radius}: Area = 3.14159 × {radius}²",
-                f"3. Calculate: Area = {answer} square units"
+                f"3. Calculate: Area = {answer} square units",
+                f"4. Your answer was {user_answer}, but π × {radius}² = {answer}"
             ]
     
     return steps
@@ -311,12 +284,29 @@ def main():
                 st.error("❌ Not quite correct.")
                 st.session_state.streak = 0
                 
+                # Show error analysis
+                mistake_analysis = analyze_mistake(problem, answer, user_answer, topic)
+                st.markdown("### Understanding Your Answer:")
+                st.markdown(f"**Your answer:** {user_answer}")
+                st.markdown(f"**Correct answer:** {answer}")
+                st.markdown(f"**What went wrong:** {mistake_analysis}")
+                
                 # Show solution steps
                 st.markdown("### Let's solve this step by step:")
                 steps = get_solution_steps(problem, answer, topic, user_answer)
                 for step in steps:
                     st.markdown(f"- {step}")
-                st.markdown(f"**The correct answer is: {answer}**")
+                
+                # Show comparison if relevant
+                if topic == "Arithmetic":
+                    st.markdown("### Compare the solutions:")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown("**Your approach:**")
+                        st.markdown(f"{problem} = {user_answer}")
+                    with col2:
+                        st.markdown("**Correct approach:**")
+                        st.markdown(f"{problem} = {answer}")
             
             # Generate new problem
             if topic == "Arithmetic":
