@@ -359,54 +359,51 @@ def main():
         st.markdown(f"#### {problem}")
         
         user_answer = st.number_input("Your answer:", step=0.01, format="%.2f")
+
+    if st.button("Submit Answer"):
+    st.session_state.total_questions += 1
+    
+    if abs(user_answer - answer) < 0.01:
+        st.success("🎉 Correct! Well done!")
+        st.session_state.score += 1
+        st.session_state.streak += 1
+    else:
+        st.error("❌ Not quite correct.")
+        st.session_state.streak = 0
         
-        if st.button("Submit Answer"):
-            st.session_state.total_questions += 1
-            
-            if abs(user_answer - answer) < 0.01:
-                st.success("🎉 Correct! Well done!")
-                st.session_state.score += 1
-                st.session_state.streak += 1
-            else:
-                st.error("❌ Not quite correct.")
-                st.session_state.streak = 0
-                
-                # Show error analysis and solution in separate expanders
-                with st.expander("📝 See Analysis", expanded=True):
-                    mistake_analysis = analyze_mistake(problem, answer, user_answer, topic)
-                    st.markdown("### Understanding Your Answer:")
-                    st.markdown(f"**Your answer:** {user_answer}")
-                    st.markdown(f"**Correct answer:** {answer}")
-                    st.markdown(f"**What went wrong:** {mistake_analysis}")
-                
-                with st.expander("✨ See Solution Steps", expanded=True):
-                    st.markdown("### Step-by-Step Solution:")
-                    steps = get_solution_steps(problem, answer, topic, user_answer)
-                    for step in steps:
-                        st.markdown(f"{step}")
-                        st.markdown("---")
-                
-                # Show comparison if relevant
-                if topic == "Arithmetic":
-                    with st.expander("🔍 Compare Solutions", expanded=True):
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.markdown("**Your approach:**")
-                            st.markdown(f"{problem} = {user_answer}")
-                        with col2:
-                            st.markdown("**Correct approach:**")
-                            st.markdown(f"{problem} = {answer}")
-            
-            # Generate new problem for next attempt
-            if topic == "Arithmetic":
-                st.session_state.current_problem = generate_arithmetic_problem(difficulty)
-            elif topic == "Algebra":
-                st.session_state.current_problem = generate_algebra_problem(difficulty)
-            else:
-                st.session_state.current_problem = generate_geometry_problem(difficulty)
-            
-            # Force a rerun to show the new problem
-            st.rerun()
+        # Show solution steps immediately
+        st.markdown("### How to Solve This Problem:")
+        steps = get_solution_steps(problem, answer, topic, user_answer)
+        for step in steps:
+            st.markdown(f"{step}")
+        
+        st.markdown("### Understanding the Mistake:")
+        st.markdown(f"**Your answer:** {user_answer}")
+        st.markdown(f"**Correct answer:** {answer}")
+        mistake_analysis = analyze_mistake(problem, answer, user_answer, topic)
+        st.markdown(f"**Explanation:** {mistake_analysis}")
+        
+        # For arithmetic problems, show the comparison
+        if topic == "Arithmetic":
+            st.markdown("### Side by Side Comparison:")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("**Your approach:**")
+                st.markdown(f"{problem} = {user_answer}")
+            with col2:
+                st.markdown("**Correct approach:**")
+                st.markdown(f"{problem} = {answer}")
+    
+    # Generate new problem for next attempt
+    if topic == "Arithmetic":
+        st.session_state.current_problem = generate_arithmetic_problem(difficulty)
+    elif topic == "Algebra":
+        st.session_state.current_problem = generate_algebra_problem(difficulty)
+    else:
+        st.session_state.current_problem = generate_geometry_problem(difficulty)
+    
+    # Force a rerun to show the new problem
+    st.rerun()
     
     with col2:
         # Progress bar and accuracy
