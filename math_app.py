@@ -152,88 +152,95 @@ def get_solution_steps(problem, answer, topic, user_answer):
             
             if operation == '+':
                 steps = [
-                    f"1. Line up the numbers vertically:\n   {a}\n   + {b}",
-                    f"2. Add digits from right to left\n   {a}\n   + {b}\n   ———\n   {answer}",
-                    "3. Check: Does each column sum correctly?",
-                    f"The correct answer is {answer}"
+                    f"Step 1: Let's add {a} and {b}",
+                    f"First, write the numbers vertically:\n\n   {a}\n   + {b}\n   ___",
+                    f"Add from right to left:",
+                    f"The sum is: {answer}",
+                    f"To check: {a} + {b} = {answer}"
                 ]
             elif operation == '-':
                 steps = [
-                    f"1. Line up the numbers vertically:\n   {a}\n   - {b}",
-                    f"2. Subtract digits from right to left\n   {a}\n   - {b}\n   ———\n   {answer}",
-                    "3. Check: Do you need to borrow from the next column?",
-                    f"The correct answer is {answer}"
+                    f"Step 1: Let's subtract {b} from {a}",
+                    f"Write the numbers vertically:\n\n   {a}\n   - {b}\n   ___",
+                    f"Subtract from right to left:",
+                    f"The difference is: {answer}",
+                    f"To check: {a} - {b} = {answer}"
                 ]
             elif operation == '×':
                 steps = [
-                    f"1. Set up multiplication:\n   {a}\n   × {b}",
-                    f"2. Multiply each digit:\n   {a}\n   × {b}\n   ———\n   {answer}",
-                    "3. Check: Did you add the products correctly?",
-                    f"The correct answer is {answer}"
+                    f"Step 1: Let's multiply {a} and {b}",
+                    f"Write the multiplication vertically:\n\n   {a}\n   × {b}\n   ___",
+                    f"Multiply each digit:",
+                    f"The product is: {answer}",
+                    f"To check: {a} × {b} = {answer}"
                 ]
             elif operation == '÷':
                 steps = [
-                    f"1. Set up division: {a} ÷ {b}",
-                    f"2. How many times does {b} go into {a}?",
-                    f"3. Multiply: {b} × {answer} = {a}",
-                    f"The correct answer is {answer}"
+                    f"Step 1: Let's divide {a} by {b}",
+                    f"Think: How many times does {b} go into {a}?",
+                    f"Divide: {a} ÷ {b} = {answer}",
+                    f"To check: {answer} × {b} = {a}"
                 ]
         except:
             steps = [
-                "Error processing arithmetic problem",
-                "Please try again"
+                "Let's solve this step by step:",
+                f"1. The problem is: {problem}",
+                f"2. The correct answer is: {answer}",
+                "3. Try writing out each step of your calculation"
             ]
     
     elif topic == "Algebra":
-        if "+" in problem:
-            left_side = problem.split("=")[0].strip()
-            right_side = problem.split("=")[1].strip()
+        # Enhanced algebra solution steps
+        if "=" in problem:
+            equation = problem.split(": ")[1]  # Remove "Solve for x: " part
+            left_side = equation.split("=")[0].strip()
+            right_side = equation.split("=")[1].strip()
             steps = [
-                f"1. Original equation: {problem}",
-                f"2. Subtract the constant from both sides",
-                f"3. Combine like terms",
-                f"4. Divide both sides to isolate x",
-                f"The correct answer is x = {answer}"
+                f"Step 1: Start with the equation\n{equation}",
+                "Step 2: Move all terms with x to the left side, all other terms to the right side",
+                f"Step 3: Combine like terms",
+                f"Step 4: Solve for x: x = {answer}",
+                f"Step 5: Check your answer by plugging x = {answer} back into the original equation"
             ]
-        else:
-            steps = [
-                f"1. Original equation: {problem}",
-                "2. Move all terms with x to one side",
-                "3. Move all constant terms to the other side",
-                f"4. Solve for x: x = {answer}",
-                f"5. Check: Plug {answer} back into the original equation"
-            ]
+            if "²" in problem or "^2" in problem:
+                steps.insert(2, "Remember: When solving quadratic equations, consider both positive and negative solutions")
     
     elif topic == "Geometry":
-        if "rectangle" in problem:
-            dimensions = problem.split("with")[1].strip()
+        if "rectangle" in problem.lower():
+            width = problem.split("width")[1].split("and")[0].strip()
+            height = problem.split("height")[1].strip()
             steps = [
-                f"1. Problem: {problem}",
-                "2. Formula: Area of rectangle = width × height",
-                f"3. Given {dimensions}",
-                f"4. Calculate: {answer} square units",
-                f"Your answer: {user_answer}, Correct answer: {answer}"
+                f"Step 1: Identify the formula\nArea of rectangle = width × height",
+                f"Step 2: Plug in the values\nwidth = {width}\nheight = {height}",
+                f"Step 3: Calculate\n{width} × {height} = {answer}",
+                f"The area is {answer} square units"
             ]
-        elif "triangle" in problem:
-            dimensions = problem.split("with")[1].strip()
+        elif "triangle" in problem.lower():
+            base = problem.split("base")[1].split("and")[0].strip()
+            height = problem.split("height")[1].strip()
             steps = [
-                f"1. Problem: {problem}",
-                "2. Formula: Area of triangle = ½ × base × height",
-                f"3. Given {dimensions}",
-                f"4. Calculate: {answer} square units",
-                f"Your answer: {user_answer}, Correct answer: {answer}"
+                f"Step 1: Identify the formula\nArea of triangle = ½ × base × height",
+                f"Step 2: Plug in the values\nbase = {base}\nheight = {height}",
+                f"Step 3: Calculate\n½ × {base} × {height} = {answer}",
+                f"The area is {answer} square units"
             ]
-        elif "circle" in problem:
+        elif "circle" in problem.lower():
             radius = problem.split("radius")[1].split("(")[0].strip()
             steps = [
-                f"1. Problem: {problem}",
-                "2. Formula: Area of circle = πr²",
-                f"3. Given radius = {radius}",
-                f"4. Calculate: π × {radius}² = {answer} square units",
-                f"Your answer: {user_answer}, Correct answer: {answer}"
+                f"Step 1: Identify the formula\nArea of circle = πr²",
+                f"Step 2: Use π = 3.14159",
+                f"Step 3: Plug in radius = {radius}",
+                f"Step 4: Calculate\n3.14159 × {radius} × {radius} = {answer}",
+                f"The area is {answer} square units"
             ]
     
-    return steps
+    # Make sure each step is clearly visible
+    formatted_steps = []
+    for i, step in enumerate(steps, 1):
+        formatted_steps.append(f"{step}")
+        formatted_steps.append("---")  # Add separator between steps
+    
+    return formatted_steps
 
 def generate_arithmetic_problem(difficulty):
     if difficulty == "Easy":
