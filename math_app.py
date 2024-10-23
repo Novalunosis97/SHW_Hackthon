@@ -141,8 +141,6 @@ def analyze_mistake(problem, correct_answer, user_answer, topic):
     # Default response if no specific analysis can be made
     return "Let's break this down and solve it step by step to understand where the mistake occurred."
 
-       
-
 def get_solution_steps(problem, answer, topic, user_answer):
     """Generate step-by-step solution explanation"""
     steps = []
@@ -180,8 +178,13 @@ def get_solution_steps(problem, answer, topic, user_answer):
                     f"3. Multiply: {b} × {answer} = {a}",
                     f"The correct answer is {answer}"
                 ]
+        except:
+            steps = [
+                "Error processing arithmetic problem",
+                "Please try again"
+            ]
     
-     elif topic == "Algebra":
+    elif topic == "Algebra":
         if "+" in problem:
             left_side = problem.split("=")[0].strip()
             right_side = problem.split("=")[1].strip()
@@ -201,7 +204,7 @@ def get_solution_steps(problem, answer, topic, user_answer):
                 f"5. Check: Plug {answer} back into the original equation"
             ]
     
-     elif topic == "Geometry":
+    elif topic == "Geometry":
         if "rectangle" in problem:
             dimensions = problem.split("with")[1].strip()
             steps = [
@@ -443,4 +446,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
