@@ -3,6 +3,112 @@ import random
 import time
 from datetime import datetime
 
+def analyze_mistake(problem, correct_answer, user_answer, topic):
+    """Analyze what went wrong with the user's answer"""
+    if topic == "Arithmetic":
+        a, operation, b = problem.split()
+        a, b = int(a), int(b)
+        
+        if operation == '+':
+            if user_answer < correct_answer:
+                return f"Your answer {user_answer} is too small. Did you carry all digits correctly?"
+            else:
+                return f"Your answer {user_answer} is too large. Check if you added all digits correctly."
+        
+        elif operation == '-':
+            if user_answer > correct_answer:
+                return f"Your answer {user_answer} is too large. Did you borrow correctly?"
+            else:
+                return f"Your answer {user_answer} is too small. Check your subtraction steps."
+        
+        elif operation == '×':
+            if user_answer == a + b:
+                return f"It looks like you added {a} + {b} instead of multiplying them."
+            elif user_answer < correct_answer:
+                return f"Your answer {user_answer} is too small. Check if you multiplied all digits correctly."
+            else:
+                return f"Your answer {user_answer} is too large. Check your multiplication steps."
+        
+        elif operation == '÷':
+            if user_answer == a * b:
+                return f"It looks like you multiplied {a} × {b} instead of dividing them."
+            elif abs(user_answer - correct_answer) < 1:
+                return f"You're close! Did you round your answer correctly?"
+            else:
+                return f"Check your division steps. Remember, {a} ÷ {b} means 'how many {b}s go into {a}?'"
+    
+    elif topic == "Algebra":
+        if abs(user_answer) == abs(correct_answer) and user_answer != correct_answer:
+            return "Check the sign of your answer. Did you move terms correctly between sides?"
+        elif "+" in problem:
+            equation = problem.split("=")[0].strip()
+            if user_answer * 2 == correct_answer:
+                return f"Did you forget to consider both sides of the equation? Remember to isolate the variable."
+            else:
+                return f"Check how you isolated the variable. What steps did you take to solve for x?"
+        else:
+            return f"Your answer {user_answer} doesn't satisfy the equation. Try plugging it back in to check."
+    
+    elif topic == "Geometry":
+        if "rectangle" in problem:
+            if abs(user_answer - correct_answer) < correct_answer * 0.1:
+                return "You're close! Double-check your multiplication."
+            else:
+                return "Remember: Area of a rectangle = width × height. Did you multiply both dimensions?"
+        
+        elif "triangle" in problem:
+            if user_answer == correct_answer * 2:
+                return "Did you forget to divide by 2? Remember: Area of triangle = (base × height) ÷ 2"
+            else:
+                return "Remember: Area of triangle = (base × height) ÷ 2. Check your calculations."
+        
+        elif "circle" in problem:
+            if abs(user_answer - correct_answer) < 1:
+                return "Almost there! Did you use 3.14159 for π?"
+            elif user_answer == correct_answer / 2:
+                return "Did you forget to square the radius? Area = πr²"
+            else:
+                return "Remember: Area of circle = πr². Check your calculations."
+    
+    return "Let's look at how to solve this step by step."
+
+[... Rest of the previous code remains the same until the submit answer button handling ...]
+
+        if st.button("Submit Answer"):
+            st.session_state.total_questions += 1
+            
+            if abs(user_answer - answer) < 0.01:
+                st.success("🎉 Correct! Well done!")
+                st.session_state.score += 1
+                st.session_state.streak += 1
+            else:
+                st.error("❌ Not quite correct.")
+                st.session_state.streak = 0
+                
+                # Show error analysis
+                mistake_analysis = analyze_mistake(problem, answer, user_answer, topic)
+                st.markdown("### Understanding Your Answer:")
+                st.markdown(f"**Your answer:** {user_answer}")
+                st.markdown(f"**Correct answer:** {answer}")
+                st.markdown(f"**What went wrong:** {mistake_analysis}")
+                
+                # Show solution steps
+                st.markdown("### Let's solve this step by step:")
+                steps = get_solution_steps(problem, answer, topic, user_answer)
+                for step in steps:
+                    st.markdown(f"- {step}")
+                
+                # Show comparison if relevant
+                if topic == "Arithmetic":
+                    st.markdown("### Compare the solutions:")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown("**Your approach:**")
+                        st.markdown(f"{problem} = {user_answer}")
+                    with col2:
+                        st.markdown("**Correct approach:**")
+                        st.markdown(f"{problem} = {answer}")
+
 def get_solution_steps(problem, answer, topic, user_answer):
     if topic == "Arithmetic":
         a, operation, b = problem.split()
