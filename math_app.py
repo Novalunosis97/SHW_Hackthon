@@ -306,10 +306,9 @@ def generate_geometry_problem(difficulty):
 def main():
     st.set_page_config(page_title="Math Practice", page_icon="🔢")
     
-    st.title("🎓 Math Practice")
+    st.title("Math Practice: Let's Go!!")
     st.markdown("""
-    Practice your math skills with different topics and difficulty levels.
-    Get immediate feedback and learn from detailed explanations!
+    Let's pratice math together :DD
     """)
     
     if 'score' not in st.session_state:
